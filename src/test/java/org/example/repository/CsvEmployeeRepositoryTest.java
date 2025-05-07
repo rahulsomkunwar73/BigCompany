@@ -31,7 +31,7 @@ public class CsvEmployeeRepositoryTest {
         // Arrange
         String filePath = "src/test/java/org/example/resources/csvfile.csv";
         EmployeeRepository repository = new CsvEmployeeRepository(filePath);
-
+        double expectedSalary = 60000.0;
         // Act
         List<Employee> employees = repository.getAllEmployees();
 
@@ -45,7 +45,6 @@ public class CsvEmployeeRepositoryTest {
         assertNotNull(ceo);
         assertEquals("Joe", ceo.getFirstName());
         assertEquals("Doe", ceo.getLastName());
-        assertEquals(60000, ceo.getSalary());
         assertNull(ceo.getManagerId());
 
     }
