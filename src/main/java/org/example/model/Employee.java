@@ -19,4 +19,23 @@ public class Employee {
         this.managerId = managerId;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public String getManagerId() {
+        return managerId;
+    }
 }
