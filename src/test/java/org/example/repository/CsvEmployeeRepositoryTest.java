@@ -93,4 +93,17 @@ public class CsvEmployeeRepositoryTest {
         assertEquals(employees.size(), 2);
     }
 
+    @Test
+    public void testInvalidFilePath() throws IOException {
+        // Arrange
+        String filePath = "src/test/java/org/example/resources/invalidPath.csv";
+        EmployeeRepository repository = new CsvEmployeeRepository(filePath);
+
+        // Assert
+        assertThrows(IOException.class, () -> {
+            repository.getAllEmployees();
+        });
+    }
+
+
 }
