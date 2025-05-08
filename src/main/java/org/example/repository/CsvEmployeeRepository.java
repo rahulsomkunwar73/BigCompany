@@ -7,11 +7,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class CsvEmployeeRepository implements EmployeeRepository{
+public class CsvEmployeeRepository implements EmployeeRepository {
 
-    String filePath;
+    private final String filePath;
+    private Map<String, Employee> employeeMap;
+    private Employee ceo;
+    private boolean dataLoaded = false;
 
     public CsvEmployeeRepository(String filePath) {
         this.filePath = filePath;
@@ -19,7 +24,28 @@ public class CsvEmployeeRepository implements EmployeeRepository{
 
     @Override
     public List<Employee> getAllEmployees() throws IOException {
-        List<Employee> employees = new ArrayList<>();
+        loadDataIfNeeded();
+        return new ArrayList<>(employeeMap.values());
+    }
+
+    @Override
+    public Map<String, Employee> buildOrganizationalStructure() throws IOException {
+        loadDataIfNeeded();
+        return employeeMap;
+    }
+
+    @Override
+    public Employee getCEO() throws IOException {
+        loadDataIfNeeded();
+        return ceo;
+    }
+
+    private void loadDataIfNeeded() throws IOException {
+        if (dataLoaded) {
+            return;
+        }
+
+        employeeMap = new HashMap<>();
 
         File file = new File(filePath);
         if (!file.exists()) {
@@ -36,6 +62,7 @@ public class CsvEmployeeRepository implements EmployeeRepository{
         }
 
         String rawContent = content.toString().trim();
+        System.out.println("Raw file content: " + rawContent);
 
         // Split the content by spaces to get individual records
         String[] records = rawContent.split("\\s+");
@@ -44,15 +71,20 @@ public class CsvEmployeeRepository implements EmployeeRepository{
             throw new IllegalArgumentException("CSV file must have a header with 'Id' and 'firstName' columns");
         }
 
+        // First pass: Create all employees
         for (int i = 1; i < records.length; i++) {
             String record = records[i];
 
             try {
                 Employee employee = parseEmployee(record);
                 if (employee != null) {
-                    employees.add(employee);
+                    employeeMap.put(employee.getId(), employee);
                     System.out.println("Added employee: " + employee.getId() + ", " +
                             employee.getFirstName() + " " + employee.getLastName());
+
+                    if (employee.isCEO()) {
+                        ceo = employee;
+                    }
                 }
             } catch (Exception e) {
                 // Skip invalid lines
@@ -60,14 +92,40 @@ public class CsvEmployeeRepository implements EmployeeRepository{
             }
         }
 
-        // Debug output
-        System.out.println("Total employees loaded: " + employees.size());
-        for (Employee emp : employees) {
-            System.out.println("Employee: " + emp.getId() + ", " + emp.getFirstName() + " " + emp.getLastName() +
-                    ", Manager ID: " + (emp.getManagerId() == null ? "null" : emp.getManagerId()));
+        // Second pass: Establish manager-subordinate relationships
+        for (Employee employee : employeeMap.values()) {
+            String managerId = employee.getManagerId();
+            if (managerId != null) {
+                Employee manager = employeeMap.get(managerId);
+                if (manager != null) {
+                    employee.setManager(manager);
+                    manager.addSubordinate(employee);
+                }
+            }
         }
 
-        return employees;
+        // Third pass: Calculate distances from CEO
+        if (ceo != null) {
+            calculateDistanceFromCEO(ceo, 0);
+        }
+
+        // Debug output
+        System.out.println("Total employees loaded: " + employeeMap.size());
+        for (Employee emp : employeeMap.values()) {
+            System.out.println("Employee: " + emp.getId() + ", " + emp.getFirstName() + " " + emp.getLastName() +
+                    ", Manager ID: " + (emp.getManagerId() == null ? "null" : emp.getManagerId()) +
+                    ", Subordinates: " + emp.getSubordinates().size() +
+                    ", Distance from CEO: " + emp.getDistanceFromCEO());
+        }
+
+        dataLoaded = true;
+    }
+
+    private void calculateDistanceFromCEO(Employee employee, int distance) {
+        employee.setDistanceFromCEO(distance);
+        for (Employee subordinate : employee.getSubordinates()) {
+            calculateDistanceFromCEO(subordinate, distance + 1);
+        }
     }
 
     private Employee parseEmployee(String record) {

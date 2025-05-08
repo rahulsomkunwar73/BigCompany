@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,19 +39,50 @@ public class CsvEmployeeRepositoryTest {
         EmployeeRepository repository = new CsvEmployeeRepository(filePath);
 
         // Act
-        List<Employee> employees = repository.getAllEmployees();
+        Employee ceo = repository.getCEO();
 
         // Assert
-        Employee ceo = employees.stream()
-                .filter(e -> e.getId().equals("123"))
-                .findFirst()
-                .orElse(null);
-
         assertNotNull(ceo);
+        assertEquals("123", ceo.getId());
         assertEquals("Joe", ceo.getFirstName());
         assertEquals("Doe", ceo.getLastName());
         assertEquals(60000, ceo.getSalary(), 0.01);
         assertNull(ceo.getManagerId());
+        assertEquals(0, ceo.getDistanceFromCEO());
+    }
+
+    @Test
+    public void testOrganizationalStructure() throws IOException {
+        // Arrange
+        String filePath = "src/test/java/org/example/resources/csvfile.csv";
+        EmployeeRepository repository = new CsvEmployeeRepository(filePath);
+
+        // Act
+        Map<String, Employee> organizationMap = repository.buildOrganizationalStructure();
+
+        // Assert
+        assertNotNull(organizationMap);
+        assertEquals(5, organizationMap.size());
+
+        // Check CEO
+        Employee ceo = organizationMap.get("123");
+        assertNotNull(ceo);
+        assertEquals(2, ceo.getSubordinates().size());
+        assertEquals(0, ceo.getDistanceFromCEO());
+
+        // Check manager level
+        Employee manager = organizationMap.get("124");
+        assertNotNull(manager);
+        assertEquals("123", manager.getManagerId());
+        assertEquals(1, manager.getDistanceFromCEO());
+        assertEquals(1, manager.getSubordinates().size());
+
+        // Check employee level
+        Employee employee = organizationMap.get("300");
+        assertNotNull(employee);
+        assertEquals("124", employee.getManagerId());
+        assertEquals(2, employee.getDistanceFromCEO());
+        assertEquals(1, employee.getSubordinates().size());
     }
 
     @Test
@@ -101,5 +133,22 @@ public class CsvEmployeeRepositoryTest {
         assertThrows(IOException.class, () -> {
             repository.getAllEmployees();
         });
+    }
+
+    @Test
+    public void testSubordinatesAverageSalary() throws IOException {
+        // Arrange
+        String filePath = "src/test/java/org/example/resources/csvfile.csv";
+        EmployeeRepository repository = new CsvEmployeeRepository(filePath);
+
+        // Act
+        Map<String, Employee> orgMap = repository.buildOrganizationalStructure();
+
+        // Assert
+        Employee manager = orgMap.get("124"); // Martin Chekov
+        assertEquals(1, manager.getSubordinates().size());
+
+        double avgSalary = manager.getSubordinatesAverageSalary();
+        assertEquals(50000, avgSalary, 0.01); // Alice Hasacat's salary
     }
 }
