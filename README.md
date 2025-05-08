@@ -4,6 +4,9 @@
 
 This project is designed to analyse employee data
 
+## Assumptions
+The file is assumed to have head `Id,firstName,lastName,salary,managerId` else application will throw IllegalArgumentException
+
 ## Instructions to Run the Project
 
 1. **Clone the repository:**

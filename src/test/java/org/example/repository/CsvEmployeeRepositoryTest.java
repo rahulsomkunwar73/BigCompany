@@ -9,11 +9,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.*;
-
 public class CsvEmployeeRepositoryTest {
 
     @Test
@@ -35,7 +35,6 @@ public class CsvEmployeeRepositoryTest {
         // Arrange
         String filePath = "src/test/java/org/example/resources/csvfile.csv";
         EmployeeRepository repository = new CsvEmployeeRepository(filePath);
-        double expectedSalary = 60000.0;
         // Act
         List<Employee> employees = repository.getAllEmployees();
 
@@ -51,6 +50,27 @@ public class CsvEmployeeRepositoryTest {
         assertEquals("Doe", ceo.getLastName());
         assertEquals(60000, ceo.getSalary(), 0.01);
         assertNull(ceo.getManagerId());
+
+    }
+
+    @Test
+    public void testEmployeeDataWithoutHeader() throws IOException {
+        Path tempDir = Files.createTempDirectory("test-temp-dir");
+
+        File csvFile = tempDir.resolve("test-data-invalid-line.csv").toFile();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            writer.write("123,Joe,Doe,60000,\n");
+            writer.write("invalidLine\n"); // This should be skipped
+            writer.write("124,Martin,Chekov,45000,123\n");
+        }
+
+        EmployeeRepository repository = new CsvEmployeeRepository(csvFile.getAbsolutePath());
+        // Assert
+
+        assertThrows(IllegalArgumentException.class, () -> {
+             repository.getAllEmployees();
+        });
+
 
     }
 
