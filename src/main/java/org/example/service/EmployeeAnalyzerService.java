@@ -12,4 +12,5 @@ public interface EmployeeAnalyzerService {
    double calculateUnderpaymentAmount(Employee manager);
 
 
+   List<Employee> findManagersEarningMoreThanAllowed();
 }

@@ -48,4 +48,9 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
 
         return 0;
     }
+
+    @Override
+    public List<Employee> findManagersEarningMoreThanAllowed() {
+        return null;
+    }
 }
