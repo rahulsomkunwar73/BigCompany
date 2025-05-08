@@ -6,6 +6,7 @@ This project is designed to analyse employee data
 
 ## Assumptions
 The file is assumed to have head `Id,firstName,lastName,salary,managerId` else application will throw IllegalArgumentException
+The file is assumed to have comma separated values `124,Martin,Chekov,45000,123` 
 
 ## Instructions to Run the Project
 

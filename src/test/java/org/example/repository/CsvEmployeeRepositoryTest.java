@@ -60,7 +60,6 @@ public class CsvEmployeeRepositoryTest {
         File csvFile = tempDir.resolve("test-data-invalid-line.csv").toFile();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
             writer.write("123,Joe,Doe,60000,\n");
-            writer.write("invalidLine\n"); // This should be skipped
             writer.write("124,Martin,Chekov,45000,123\n");
         }
 
@@ -72,6 +71,26 @@ public class CsvEmployeeRepositoryTest {
         });
 
 
+    }
+
+    @Test
+    public void testEmployeeDataWithInvalidLine() throws IOException {
+        Path tempDir = Files.createTempDirectory("test-temp-dir");
+
+        File csvFile = tempDir.resolve("test-data-invalid-line.csv").toFile();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+            writer.write("Id,firstName,lastName,salary,managerId\n");
+            writer.write("123,Joe,Doe,60000,\n");
+            writer.write("invalidLine\n"); // This should be skipped
+            writer.write("124,Martin,Chekov,45000,123\n");
+        }
+
+        EmployeeRepository repository = new CsvEmployeeRepository(csvFile.getAbsolutePath());
+        List<Employee> employees = repository.getAllEmployees();
+
+        // Assert
+        assertNotNull(employees);
+        assertEquals(employees.size(), 2);
     }
 
 }
