@@ -37,6 +37,8 @@ public class CsvEmployeeRepository implements EmployeeRepository{
         int startIndex = 0;
         if (records.length > 0 && records[0].toLowerCase().contains("id")) {
             startIndex = 1;
+        } else {
+            throw new IllegalArgumentException("Invalid record format: ");
         }
 
         for (int i = startIndex; i < records.length; i++) {
@@ -71,7 +73,7 @@ public class CsvEmployeeRepository implements EmployeeRepository{
                     Employee employee = new Employee(id, firstName, lastName, salary, managerId);
                     employees.add(employee);
                 } else {
-                    throw new IllegalArgumentException("Invalid record format: " + record);
+                    System.err.println("Invalid record format (less than 4 parts): " + record);
                 }
             }
         }
