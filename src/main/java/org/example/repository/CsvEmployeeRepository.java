@@ -41,19 +41,14 @@ public class CsvEmployeeRepository implements EmployeeRepository{
 
         for (int i = startIndex; i < records.length; i++) {
             String record = records[i];
-            System.out.println("Processing record: " + record);
 
-            // Process the record
             if (record != null && !record.trim().isEmpty()) {
-                // Handle the special case where the record ends with a comma
-                // This indicates an empty manager ID which should be treated as null
                 if (record.endsWith(",")) {
-                    record = record + " "; // Add a space to ensure it splits correctly
+                    record = record + " ";
                 }
 
                 String[] parts = record.split(",");
 
-                // We need at least 4 parts (id, firstName, lastName, salary)
                 if (parts.length >= 4) {
                     String id = parts[0].trim();
                     String firstName = parts[1].trim();
@@ -67,7 +62,6 @@ public class CsvEmployeeRepository implements EmployeeRepository{
                         continue;
                     }
 
-                    // Manager ID is optional and can be empty
                     String managerId = null;
                     if (parts.length > 4 && !parts[4].trim().isEmpty()) {
                         managerId = parts[4].trim();
@@ -82,7 +76,6 @@ public class CsvEmployeeRepository implements EmployeeRepository{
             }
         }
 
-        // Debug output
         System.out.println("Total employees loaded: " + employees.size());
         for (Employee emp : employees) {
             System.out.println("Employee: " + emp.getId() + ", " + emp.getFirstName() + " " + emp.getLastName() +

@@ -5,7 +5,11 @@ import main.java.org.example.repository.CsvEmployeeRepository;
 import main.java.org.example.repository.EmployeeRepository;
 import org.junit.Test;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -45,9 +49,9 @@ public class CsvEmployeeRepositoryTest {
         assertNotNull(ceo);
         assertEquals("Joe", ceo.getFirstName());
         assertEquals("Doe", ceo.getLastName());
+        assertEquals(60000, ceo.getSalary(), 0.01);
         assertNull(ceo.getManagerId());
 
     }
-
 
 }
