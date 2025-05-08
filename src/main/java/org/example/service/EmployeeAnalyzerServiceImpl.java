@@ -13,6 +13,8 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
 
     EmployeeRepository csvEmployeeRepository;
     private static final double MIN_SALARY_FACTOR = 1.2; // 20% more
+    private static final double MAX_SALARY_FACTOR = 1.5; // 50% more
+
 
 
     public EmployeeAnalyzerServiceImpl(EmployeeRepository csvEmployeeRepository){
@@ -50,7 +52,32 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
     }
 
     @Override
-    public List<Employee> findManagersEarningMoreThanAllowed() {
-        return null;
+    public List<Employee> findManagersEarningMoreThanAllowed() throws IOException {
+        List<Employee> overpaidManagers = new ArrayList<>();
+        Map<String, Employee> employeeMap = csvEmployeeRepository.buildOrganizationalStructure();
+
+        for (Employee employee : employeeMap.values()) {
+            if (employee.isManager() && calculateOverpaymentAmount(employee) > 0) {
+                overpaidManagers.add(employee);
+            }
+        }
+
+        return overpaidManagers;
+    }
+
+    @Override
+    public double calculateOverpaymentAmount(Employee manager) {
+        if (!manager.isManager()) {
+            return 0;
+        }
+
+        double avgSubordinateSalary = manager.getSubordinatesAverageSalary();
+        double maxAllowedSalary = avgSubordinateSalary * MAX_SALARY_FACTOR;
+
+        if (manager.getSalary() > maxAllowedSalary) {
+            return manager.getSalary() - maxAllowedSalary;
+        }
+
+        return 0;
     }
 }

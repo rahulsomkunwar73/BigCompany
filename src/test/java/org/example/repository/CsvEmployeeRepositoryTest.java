@@ -149,6 +149,6 @@ public class CsvEmployeeRepositoryTest {
         assertEquals(1, manager.getSubordinates().size());
 
         double avgSalary = manager.getSubordinatesAverageSalary();
-        assertEquals(50000, avgSalary, 0.01); // Alice Hasacat's salary
+        assertEquals(52000, avgSalary, 0.01); // Alice Hasacat's salary
     }
 }

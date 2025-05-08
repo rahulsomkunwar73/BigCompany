@@ -12,5 +12,7 @@ public interface EmployeeAnalyzerService {
    double calculateUnderpaymentAmount(Employee manager);
 
 
-   List<Employee> findManagersEarningMoreThanAllowed();
+   List<Employee> findManagersEarningMoreThanAllowed() throws IOException;
+
+   double calculateOverpaymentAmount(Employee manager);
 }
