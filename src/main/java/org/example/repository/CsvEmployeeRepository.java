@@ -3,6 +3,7 @@ package main.java.org.example.repository;
 import main.java.org.example.model.Employee;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ public class CsvEmployeeRepository implements EmployeeRepository{
     public List<Employee> getAllEmployees() throws IOException {
         List<Employee> employees = new ArrayList<>();
 
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new IOException("File not found: " + filePath);
+        }
+
         // Read the entire file content
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -34,47 +40,23 @@ public class CsvEmployeeRepository implements EmployeeRepository{
         // Split the content by spaces to get individual records
         String[] records = rawContent.split("\\s+");
 
-        int startIndex = 0;
-        if (records.length > 0 && records[0].toLowerCase().contains("id")) {
-            startIndex = 1;
-        } else {
-            throw new IllegalArgumentException("Invalid record format: ");
+        if (records.length == 0 || !records[0].toLowerCase().contains("id") || !records[0].toLowerCase().contains("firstname")) {
+            throw new IllegalArgumentException("CSV file must have a header with 'Id' and 'firstName' columns");
         }
 
-        for (int i = startIndex; i < records.length; i++) {
+        for (int i = 1; i < records.length; i++) {
             String record = records[i];
 
-            if (record != null && !record.trim().isEmpty()) {
-                if (record.endsWith(",")) {
-                    record = record + " ";
-                }
-
-                String[] parts = record.split(",");
-
-                if (parts.length >= 4) {
-                    String id = parts[0].trim();
-                    String firstName = parts[1].trim();
-                    String lastName = parts[2].trim();
-
-                    double salary;
-                    try {
-                        salary = Double.parseDouble(parts[3].trim());
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid salary format for employee " + id + ": " + parts[3]);
-                        continue;
-                    }
-
-                    String managerId = null;
-                    if (parts.length > 4 && !parts[4].trim().isEmpty()) {
-                        managerId = parts[4].trim();
-                    }
-
-                    System.out.println("Creating employee: " + id + ", " + firstName + " " + lastName + ", " + salary + ", " + managerId);
-                    Employee employee = new Employee(id, firstName, lastName, salary, managerId);
+            try {
+                Employee employee = parseEmployee(record);
+                if (employee != null) {
                     employees.add(employee);
-                } else {
-                    System.err.println("Invalid record format (less than 4 parts): " + record);
+                    System.out.println("Added employee: " + employee.getId() + ", " +
+                            employee.getFirstName() + " " + employee.getLastName());
                 }
+            } catch (Exception e) {
+                // Skip invalid lines
+                System.err.println("Skipping invalid record: " + record + " - " + e.getMessage());
             }
         }
 
@@ -86,5 +68,44 @@ public class CsvEmployeeRepository implements EmployeeRepository{
         }
 
         return employees;
+    }
+
+    private Employee parseEmployee(String record) {
+        if (record == null || record.trim().isEmpty()) {
+            return null;
+        }
+
+        // Handle the special case where the record ends with a comma
+        if (record.endsWith(",")) {
+            record = record + " "; // Add a space to ensure it splits correctly
+        }
+
+        String[] parts = record.split(",");
+
+        // We need at least 4 parts (id, firstName, lastName, salary)
+        if (parts.length < 4) {
+            System.err.println("Invalid record format (less than 4 parts): " + record);
+            return null;
+        }
+
+        String id = parts[0].trim();
+        String firstName = parts[1].trim();
+        String lastName = parts[2].trim();
+
+        double salary;
+        try {
+            salary = Double.parseDouble(parts[3].trim());
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid salary format for employee " + id + ": " + parts[3]);
+            return null;
+        }
+
+        // Manager ID is optional and can be empty
+        String managerId = null;
+        if (parts.length > 4 && !parts[4].trim().isEmpty()) {
+            managerId = parts[4].trim();
+        }
+
+        return new Employee(id, firstName, lastName, salary, managerId);
     }
 }
