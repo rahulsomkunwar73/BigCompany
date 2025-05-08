@@ -71,11 +71,12 @@ public class CsvEmployeeRepository implements EmployeeRepository{
                     Employee employee = new Employee(id, firstName, lastName, salary, managerId);
                     employees.add(employee);
                 } else {
-                    System.err.println("Invalid record format (less than 4 parts): " + record);
+                    throw new IllegalArgumentException("Invalid record format: " + record);
                 }
             }
         }
 
+        // Debug output
         System.out.println("Total employees loaded: " + employees.size());
         for (Employee emp : employees) {
             System.out.println("Employee: " + emp.getId() + ", " + emp.getFirstName() + " " + emp.getLastName() +
