@@ -14,6 +14,7 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
     EmployeeRepository csvEmployeeRepository;
     private static final double MIN_SALARY_FACTOR = 1.2; // 20% more
     private static final double MAX_SALARY_FACTOR = 1.5; // 50% more
+    private static final int MAX_REPORTING_LINE = 4; // Maximum levels from CEO
 
 
 
@@ -80,4 +81,13 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
 
         return 0;
     }
+
+    @Override
+    public List<Employee> findEmployeesWithLongReportingLines() throws IOException {
+        List<Employee> employeesWithLongLines = new ArrayList<>();
+
+        return employeesWithLongLines;
+    }
+
+
 }

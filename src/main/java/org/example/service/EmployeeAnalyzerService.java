@@ -15,4 +15,8 @@ public interface EmployeeAnalyzerService {
    List<Employee> findManagersEarningMoreThanAllowed() throws IOException;
 
    double calculateOverpaymentAmount(Employee manager);
+
+   List<Employee> findEmployeesWithLongReportingLines() throws IOException;
+
+
 }
