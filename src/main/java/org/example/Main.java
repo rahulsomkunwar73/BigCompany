@@ -1,19 +1,46 @@
 package org.example;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import main.java.org.example.model.Employee;
+import main.java.org.example.repository.CsvEmployeeRepository;
+import main.java.org.example.repository.EmployeeRepository;
+import main.java.org.example.service.EmployeeAnalyzerService;
+import main.java.org.example.service.EmployeeAnalyzerServiceImpl;
+import java.io.IOException;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
-        // Press Opt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        // Press Ctrl+R or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        if (args.length < 1) {
+            System.out.println("Usage: java -jar BigCompany-1.0-SNAPSHOT.jar <csv_file_path>");
+            return;
+        }
 
-            // Press Ctrl+D to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Cmd+F8.
-            System.out.println("i = " + i);
+        String csvFilePath = args[0];
+
+        try {
+            EmployeeRepository repository = new CsvEmployeeRepository(csvFilePath);
+
+            EmployeeAnalyzerService analyzerService = new EmployeeAnalyzerServiceImpl(repository);
+            System.out.println("======ManagersEarningLessThanRequired======");
+            printLogs(analyzerService.findManagersEarningLessThanRequired());
+            System.out.println("\n======ManagersEarningMoreThanAllowed======");
+            printLogs(analyzerService.findManagersEarningMoreThanAllowed());
+            System.out.println("\n======EmployeesWithLongReportingLines======");
+            printLogs(analyzerService.findEmployeesWithLongReportingLines());
+
+        } catch (IOException e) {
+            System.err.println("Error reading employee data: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void printLogs(List<Employee> employees){
+        for (Employee employee : employees) {
+            System.out.println(employee.toString());
         }
     }
 }
