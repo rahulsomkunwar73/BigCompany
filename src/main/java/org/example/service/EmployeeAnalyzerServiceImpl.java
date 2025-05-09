@@ -85,9 +85,22 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
     @Override
     public List<Employee> findEmployeesWithLongReportingLines() throws IOException {
         List<Employee> employeesWithLongLines = new ArrayList<>();
+        Map<String, Employee> employeeMap = csvEmployeeRepository.buildOrganizationalStructure();
+
+        for (Employee employee : employeeMap.values()) {
+            if (calculateExcessReportingLevels(employee) > 0) {
+                employeesWithLongLines.add(employee);
+            }
+        }
 
         return employeesWithLongLines;
     }
 
+    int calculateExcessReportingLevels(Employee employee) {
+        if (employee.getDistanceFromCEO() > MAX_REPORTING_LINE) {
+            return employee.getDistanceFromCEO() - MAX_REPORTING_LINE;
+        }
 
+        return 0;
+    }
 }
