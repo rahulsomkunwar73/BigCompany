@@ -24,9 +24,9 @@ public class Main {
             EmployeeAnalyzerService analyzerService = new EmployeeAnalyzerServiceImpl(repository);
             System.out.println("======ManagersEarningLessThanRequired======");
             printLogs(analyzerService.findManagersEarningLessThanRequired());
-            System.out.println("======ManagersEarningMoreThanAllowed======");
+            System.out.println("\n======ManagersEarningMoreThanAllowed======");
             printLogs(analyzerService.findManagersEarningMoreThanAllowed());
-            System.out.println("======EmployeesWithLongReportingLines======");
+            System.out.println("\n======EmployeesWithLongReportingLines======");
             printLogs(analyzerService.findEmployeesWithLongReportingLines());
 
         } catch (IOException e) {

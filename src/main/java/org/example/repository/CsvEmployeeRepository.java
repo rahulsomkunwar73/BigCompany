@@ -62,7 +62,6 @@ public class CsvEmployeeRepository implements EmployeeRepository {
         }
 
         String rawContent = content.toString().trim();
-        System.out.println("Raw file content: " + rawContent);
 
         // Split the content by spaces to get individual records
         String[] records = rawContent.split("\\s+");
@@ -79,8 +78,6 @@ public class CsvEmployeeRepository implements EmployeeRepository {
                 Employee employee = parseEmployee(record);
                 if (employee != null) {
                     employeeMap.put(employee.getId(), employee);
-                    System.out.println("Added employee: " + employee.getId() + ", " +
-                            employee.getFirstName() + " " + employee.getLastName());
 
                     if (employee.isCEO()) {
                         ceo = employee;
@@ -108,16 +105,6 @@ public class CsvEmployeeRepository implements EmployeeRepository {
         if (ceo != null) {
             calculateDistanceFromCEO(ceo, 0);
         }
-
-        // Debug output
-        System.out.println("Total employees loaded: " + employeeMap.size());
-        for (Employee emp : employeeMap.values()) {
-            System.out.println("Employee: " + emp.getId() + ", " + emp.getFirstName() + " " + emp.getLastName() +
-                    ", Manager ID: " + (emp.getManagerId() == null ? "null" : emp.getManagerId()) +
-                    ", Subordinates: " + emp.getSubordinates().size() +
-                    ", Distance from CEO: " + emp.getDistanceFromCEO());
-        }
-
         dataLoaded = true;
     }
 

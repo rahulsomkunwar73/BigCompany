@@ -29,7 +29,8 @@ Id,firstName,lastName,salary,managerId
 
 ## Assumptions
    1. The file is assumed to have head `Id,firstName,lastName,salary,managerId` else application will throw IllegalArgumentException
-   2. The file is assumed to have 4 comma separated values `124,Martin,Chekov,45000,123` 
+   2. The file is assumed to have 4 comma separated values `124,Martin,Chekov,45000,123`
+   3. Employee data will consist only one CEO
 
 ## Instructions to Run the Project
 

@@ -1,7 +1,6 @@
 package main.java.org.example.service;
 
 import main.java.org.example.model.Employee;
-import main.java.org.example.repository.CsvEmployeeRepository;
 import main.java.org.example.repository.EmployeeRepository;
 
 import java.io.IOException;
@@ -36,8 +35,7 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
         return underpaidManagers;
     }
 
-    @Override
-    public double calculateUnderpaymentAmount(Employee manager) {
+    private double calculateUnderpaymentAmount(Employee manager) {
         if (!manager.isManager()) {
             return 0;
         }
@@ -66,8 +64,7 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
         return overpaidManagers;
     }
 
-    @Override
-    public double calculateOverpaymentAmount(Employee manager) {
+    private double calculateOverpaymentAmount(Employee manager) {
         if (!manager.isManager()) {
             return 0;
         }
@@ -100,7 +97,6 @@ public class EmployeeAnalyzerServiceImpl implements EmployeeAnalyzerService {
         if (employee.getDistanceFromCEO() > MAX_REPORTING_LINE) {
             return employee.getDistanceFromCEO() - MAX_REPORTING_LINE;
         }
-
         return 0;
     }
 }
